@@ -9,10 +9,9 @@ namespace StudentApp.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
-            var connectionString =
-                "server=localhost;port=3306;database=studentdb;user=root;password=;";
-
-            optionsBuilder.UseMySQL(connectionString);
+            optionsBuilder.UseNpgsql(
+                "YOUR_RENDER_EXTERNAL_DATABASE_URL"
+            );
 
             return new AppDbContext(optionsBuilder.Options);
         }
