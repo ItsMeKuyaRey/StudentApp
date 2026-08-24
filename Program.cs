@@ -17,8 +17,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         );
     }
 
-    // Render provides PostgreSQL URLs in postgresql:// format.
-    // Convert that URL to the key/value format Npgsql expects.
+    // Render may provide the PostgreSQL connection as:
+    // postgresql://username:password@host:port/database
     if (connectionString.StartsWith("postgresql://") ||
         connectionString.StartsWith("postgres://"))
     {
@@ -36,6 +36,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         var host = uri.Host;
         var port = uri.Port > 0 ? uri.Port : 5432;
         var database = uri.AbsolutePath.TrimStart('/');
+
         var username = Uri.UnescapeDataString(userInfo[0]);
         var password = Uri.UnescapeDataString(userInfo[1]);
 
@@ -44,7 +45,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             $"Port={port};" +
             $"Database={database};" +
             $"Username={username};" +
-            $"Password={password};";
+            $"Password={password};" +
+            $"SSL Mode=Require;";
     }
 
     options.UseNpgsql(connectionString);
@@ -52,8 +54,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// Automatically apply pending EF Core migrations on startup.
-// This creates/updates the database tables on Render.
+// Automatically apply pending EF Core migrations.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
