@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - StudentApp</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/StudentApp.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            margin: 0;
+            background: #f8f7fc;
+            color: #27243a;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .student-header {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid #ece8f4;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .student-navbar {
+            max-width: 1180px;
+            height: 72px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .student-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #241d35;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .student-brand:hover {
+            color: #241d35;
+        }
+
+        .brand-mark {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7c3aed, #9b5cf6);
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.2);
+        }
+
+        .student-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .nav-search {
+            position: relative;
+        }
+
+        .nav-search input {
+            width: 230px;
+            height: 38px;
+            padding: 0 14px 0 38px;
+            border: 1px solid #e5e0ed;
+            border-radius: 10px;
+            outline: none;
+            background: #faf9fd;
+            color: #352d43;
+            font-size: 12px;
+            transition: 0.2s ease;
+        }
+
+        .nav-search input:focus {
+            background: white;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-52%);
+            color: #91899f;
+            font-size: 18px;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .student-nav-link {
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 14px;
+            border-radius: 9px;
+            color: #70697d;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
+
+        .student-nav-link:hover {
+            color: #7c3aed;
+            background: #f3edff;
+        }
+
+        .student-nav-link.active {
+            color: #7c3aed;
+            background: #f0e9ff;
+        }
+
+        main {
+            min-height: calc(100vh - 72px);
+        }
+
+       @@media (max-width: 700px) {
+            .student-navbar {
+                height: auto;
+                min-height: 72px;
+                gap: 15px;
+            }
+
+            .student-nav {
+                gap: 10px;
+            }
+
+            .nav-search input {
+                width: 170px;
+            }
+
+            .student-nav-link {
+                padding: 0 10px;
+            }
+        }
+
+        @@media (max-width: 520px) {
+            .student-navbar {
+                padding: 12px 15px;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .student-nav {
+                width: 100%;
+            }
+
+            .nav-search {
+                flex: 1;
+            }
+
+            .nav-search input {
+                width: 100%;
+            }
+
+            .student-nav-link {
+                flex-shrink: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="student-header">
+        <div class="student-navbar">
+
+            <a class="student-brand"
+               asp-controller="Home"
+               asp-action="Index">
+                <span class="brand-mark">S</span>
+                <span>StudentApp</span>
+            </a>
+
+            <div class="student-nav">
+
+                <a class="student-nav-link active"
+                   asp-controller="Students"
+                   asp-action="Index">
+                    Students
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

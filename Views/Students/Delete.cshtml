@@ -1,0 +1,303 @@
+@model StudentApp.Models.Student
+
+@{
+    ViewData["Title"] = "Delete Student";
+
+    var initial = string.IsNullOrWhiteSpace(Model.FullName)
+        ? "S"
+        : Model.FullName.Substring(0, 1).ToUpper();
+}
+
+<style>
+    .delete-page {
+        min-height: calc(100vh - 72px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 24px 70px;
+        background:
+            radial-gradient(circle at 20% 15%, rgba(124, 58, 237, .09), transparent 28%),
+            radial-gradient(circle at 85% 85%, rgba(239, 68, 68, .07), transparent 30%),
+            #f8f7fc;
+    }
+
+    .delete-container {
+        width: 100%;
+        max-width: 650px;
+    }
+
+    .delete-card {
+        overflow: hidden;
+        border: 1px solid #e9e5f1;
+        border-radius: 24px;
+        background: white;
+        box-shadow: 0 20px 55px rgba(45, 30, 75, .10);
+    }
+
+    .delete-top {
+        padding: 35px 35px 28px;
+        text-align: center;
+        background: linear-gradient(135deg, #fffaff, #f8f4ff);
+        border-bottom: 1px solid #eeeaf5;
+    }
+
+    .warning-icon {
+        width: 68px;
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        background: #fff0f2;
+        color: #d24c63;
+    }
+
+    .warning-icon svg {
+        width: 31px;
+        height: 31px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .delete-top h1 {
+        margin: 0;
+        color: #282137;
+        font-size: 27px;
+        font-weight: 800;
+        letter-spacing: -.6px;
+    }
+
+    .delete-top p {
+        margin: 8px 0 0;
+        color: #91899f;
+        font-size: 13px;
+    }
+
+    .delete-body {
+        padding: 30px;
+    }
+
+    .student-preview {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 18px;
+        border: 1px solid #eeeaf5;
+        border-radius: 15px;
+        background: #fcfbfe;
+        margin-bottom: 22px;
+    }
+
+    .student-avatar {
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #eadcff, #f5efff);
+        color: #7138d8;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .student-preview-info strong {
+        display: block;
+        color: #30283c;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .student-preview-info span {
+        display: block;
+        margin-top: 4px;
+        color: #91899f;
+        font-size: 11px;
+    }
+
+    .student-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .detail-item {
+        padding: 15px;
+        border-radius: 12px;
+        background: #f8f6fb;
+    }
+
+    .detail-item small {
+        display: block;
+        margin-bottom: 5px;
+        color: #958da0;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+    .detail-item strong {
+        color: #342d40;
+        font-size: 13px;
+    }
+
+    .warning-message {
+        padding: 14px 16px;
+        border-radius: 11px;
+        background: #fff5f6;
+        color: #9f3d4f;
+        font-size: 11px;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .delete-button {
+        min-height: 43px;
+        padding: 0 20px;
+        border-radius: 10px;
+        border: none;
+        font-size: 12px;
+        font-weight: 750;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: .2s ease;
+    }
+
+    .delete-button:hover {
+        transform: translateY(-1px);
+    }
+
+    .delete-button.cancel {
+        background: #f2f0f5;
+        color: #625b70;
+    }
+
+    .delete-button.confirm {
+        background: #d93650;
+        color: white;
+        box-shadow: 0 8px 20px rgba(217, 54, 80, .20);
+    }
+
+    @@media (max-width: 600px) {
+        .delete-page {
+            padding: 30px 15px 50px;
+        }
+
+        .delete-body,
+        .delete-top {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .student-details {
+            grid-template-columns: 1fr;
+        }
+
+        .delete-actions {
+            flex-direction: column-reverse;
+        }
+
+        .delete-button {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="delete-page">
+    <div class="delete-container">
+
+        <section class="delete-card">
+
+            <div class="delete-top">
+
+                <div class="warning-icon">
+
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3 2.8 20h18.4L12 3z"></path>
+                        <path d="M12 9v5"></path>
+                        <path d="M12 17h.01"></path>
+                    </svg>
+
+                </div>
+
+                <h1>Delete Student</h1>
+
+                <p>This action cannot be undone.</p>
+
+            </div>
+
+            <div class="delete-body">
+
+                <div class="student-preview">
+
+                    <div class="student-avatar">
+                        @initial
+                    </div>
+
+                    <div class="student-preview-info">
+                        <strong>@Model.FullName</strong>
+                        <span>Student ID #@Model.Id</span>
+                    </div>
+
+                </div>
+
+                <div class="student-details">
+
+                    <div class="detail-item">
+                        <small>Age</small>
+                        <strong>@Model.Age years old</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <small>Course</small>
+                        <strong>@Model.Course</strong>
+                    </div>
+
+                </div>
+
+                <div class="warning-message">
+                    You are about to permanently remove this student record from the system. Please make sure this is the correct student before continuing.
+                </div>
+
+                <form asp-action="Delete" method="post">
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="delete-actions">
+
+                        <a asp-action="Index"
+                           class="delete-button cancel">
+                            Cancel
+                        </a>
+
+                        <button type="submit"
+                                class="delete-button confirm">
+                            Delete Student
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </div>
+</div>

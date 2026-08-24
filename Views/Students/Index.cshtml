@@ -1,0 +1,724 @@
+@model IEnumerable<StudentApp.Models.Student>
+
+@{
+    ViewData["Title"] = "Students";
+
+    var students = Model?.ToList() ?? new List<StudentApp.Models.Student>();
+    var totalStudents = students.Count;
+    var totalCourses = students
+        .Select(s => s.Course)
+        .Where(c => !string.IsNullOrWhiteSpace(c))
+        .Distinct()
+        .Count();
+}
+
+<style>
+    .students-page {
+        min-height: calc(100vh - 70px);
+        padding: 42px 28px 60px;
+        background: #f7f6fb;
+    }
+
+    .students-container {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    .students-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        margin-bottom: 28px;
+    }
+
+    .heading-label {
+        margin-bottom: 8px;
+        color: #7654d6;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .students-heading h1 {
+        margin: 0;
+        color: #211b2d;
+        font-size: 40px;
+        line-height: 1.1;
+        font-weight: 800;
+        letter-spacing: -1.2px;
+    }
+
+    .students-heading p {
+        margin: 9px 0 0;
+        color: #817b8e;
+        font-size: 14px;
+    }
+
+    .add-student-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 12px 18px;
+        border-radius: 10px;
+        background: #7651d8;
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(118, 81, 216, .18);
+        transition: .2s ease;
+    }
+
+    .add-student-button:hover {
+        background: #6743c5;
+        color: #fff !important;
+        transform: translateY(-1px);
+    }
+
+    .add-student-button svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+
+    .summary-row {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .summary-card {
+        position: relative;
+        overflow: hidden;
+        padding: 24px;
+        border: 1px solid #ebe7f2;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 8px 28px rgba(43, 31, 67, .045);
+    }
+
+    .summary-card::after {
+        content: "";
+        position: absolute;
+        right: -45px;
+        bottom: -55px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(118, 81, 216, .055);
+    }
+
+    .summary-label {
+        color: #8b8498;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .summary-number {
+        margin-top: 5px;
+        color: #211b2d;
+        font-size: 31px;
+        font-weight: 800;
+    }
+
+    .summary-description {
+        margin-top: 5px;
+        color: #9a94a5;
+        font-size: 11px;
+    }
+
+    .students-card {
+        overflow: hidden;
+        border: 1px solid #e9e5f0;
+        border-radius: 17px;
+        background: #fff;
+        box-shadow: 0 12px 40px rgba(42, 30, 65, .055);
+    }
+
+    .students-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #eeeaf3;
+    }
+
+    .students-card-header h2 {
+        margin: 0;
+        color: #282131;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .students-card-header p {
+        margin: 5px 0 0;
+        color: #918a9d;
+        font-size: 12px;
+    }
+
+    .table-controls {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    #courseFilter,
+    .table-search input {
+        height: 38px;
+        border: 1px solid #e4dfeb;
+        border-radius: 9px;
+        outline: none;
+        background: #fbfaff;
+        color: #40384d;
+        font-size: 12px;
+    }
+
+    #courseFilter {
+        padding: 0 32px 0 11px;
+        cursor: pointer;
+    }
+
+    .table-search {
+        position: relative;
+    }
+
+    .table-search svg {
+        position: absolute;
+        left: 11px;
+        top: 50%;
+        width: 14px;
+        height: 14px;
+        transform: translateY(-50%);
+        fill: none;
+        stroke: #aaa3b4;
+        stroke-width: 1.8;
+        pointer-events: none;
+    }
+
+    .table-search input {
+        width: 185px;
+        padding: 0 11px 0 32px;
+    }
+
+    #courseFilter:focus,
+    .table-search input:focus {
+        border-color: #a78bda;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(118, 81, 216, .08);
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .student-table {
+        width: 100%;
+        min-width: 720px;
+        border-collapse: collapse;
+    }
+
+    .student-table th {
+        padding: 13px 24px;
+        text-align: left;
+        background: #fbfafc;
+        border-bottom: 1px solid #eeeaf3;
+        color: #938c9e;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+    }
+
+    .student-table td {
+        padding: 16px 24px;
+        border-bottom: 1px solid #f1eef4;
+        color: #554d61;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .student-table tbody tr {
+        transition: .15s ease;
+    }
+
+    .student-table tbody tr:hover {
+        background: #fcfaff;
+    }
+
+    .student-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .student-id {
+        display: inline-flex;
+        padding: 5px 8px;
+        border-radius: 7px;
+        background: #f5f2f9;
+        color: #81798d;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .student-person {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .student-avatar {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 10px;
+        background: #eee8ff;
+        color: #7651d8;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .student-person strong {
+        display: block;
+        color: #30283b;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .student-person span {
+        display: block;
+        margin-top: 3px;
+        color: #a19aa9;
+        font-size: 11px;
+    }
+
+    .age-value {
+        color: #625a6d;
+        font-weight: 600;
+    }
+
+    .course-badge {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 7px;
+        background: #f0eaff;
+        color: #7044c9;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .row-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .icon-action {
+        width: 31px;
+        height: 31px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: .15s ease;
+    }
+
+    .icon-action:hover {
+        transform: translateY(-1px);
+    }
+
+    .icon-action svg {
+        width: 14px;
+        height: 14px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .icon-action.view {
+        background: #f2f0f5;
+        color: #665f70;
+    }
+
+    .icon-action.view:hover {
+        background: #e9e6ed;
+    }
+
+    .icon-action.edit {
+        background: #eee6ff;
+        color: #7040d2;
+    }
+
+    .icon-action.edit:hover {
+        background: #e3d8ff;
+    }
+
+    .icon-action.delete {
+        background: #fff0f2;
+        color: #cf4c63;
+    }
+
+    .icon-action.delete:hover {
+        background: #ffe2e7;
+    }
+
+    .empty-state {
+        padding: 65px 20px;
+        text-align: center;
+    }
+
+    .empty-state h3 {
+        margin: 0;
+        color: #30283b;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        margin: 7px 0 20px;
+        color: #938b9d;
+        font-size: 13px;
+    }
+
+    .students-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 24px;
+        border-top: 1px solid #eeeaf3;
+        background: #fcfbfd;
+        color: #918a9b;
+        font-size: 11px;
+    }
+
+    .students-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding: 0 3px;
+        color: #958e9f;
+        font-size: 11px;
+    }
+
+    .students-footer a {
+        color: #7651d8;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 850px) {
+        .students-heading {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .summary-row {
+            grid-template-columns: 1fr;
+        }
+
+        .students-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .table-controls {
+            width: 100%;
+        }
+
+        .table-search {
+            flex: 1;
+        }
+
+        .table-search input {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .students-page {
+            padding: 28px 15px 45px;
+        }
+
+        .students-heading h1 {
+            font-size: 34px;
+        }
+
+        .students-footer {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+</style>
+
+<div class="students-page">
+    <div class="students-container">
+
+        <div class="students-heading">
+            <div>
+                <div class="heading-label">Student Management</div>
+                <h1>Students</h1>
+                <p>Manage student records and course information.</p>
+            </div>
+
+            <a asp-controller="Students"
+               asp-action="Create"
+               class="add-student-button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 5v14"></path>
+                    <path d="M5 12h14"></path>
+                </svg>
+                Add Student
+            </a>
+        </div>
+
+        <div class="summary-row">
+            <div class="summary-card">
+                <div class="summary-label">Total Students</div>
+                <div class="summary-number">@totalStudents</div>
+                <div class="summary-description">Registered student records</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Courses</div>
+                <div class="summary-number">@totalCourses</div>
+                <div class="summary-description">Courses represented in records</div>
+            </div>
+        </div>
+
+        <section class="students-card">
+
+            <div class="students-card-header">
+                <div>
+                    <h2>Student List</h2>
+                    <p>All registered students</p>
+                </div>
+
+                <div class="table-controls">
+                    <select id="courseFilter">
+                        <option value="">All Courses</option>
+
+                        @foreach (var course in students
+                            .Select(s => s.Course)
+                            .Where(c => !string.IsNullOrWhiteSpace(c))
+                            .Distinct()
+                            .OrderBy(c => c))
+                        {
+                            <option value="@course">@course</option>
+                        }
+                    </select>
+
+                    <div class="table-search">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="6.5"></circle>
+                            <path d="m16 16 5 5"></path>
+                        </svg>
+
+                        <input type="text"
+                               id="tableStudentSearch"
+                               placeholder="Search students..."
+                               autocomplete="off" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Age</th>
+                            <th>Course</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="studentTableBody">
+                        @if (students.Any())
+                        {
+                            foreach (var student in students)
+                            {
+                                <tr class="student-row"
+                                    data-name="@student.FullName"
+                                    data-course="@student.Course">
+
+                                    <td>
+                                        <span class="student-id">
+                                            #@student.Id
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="student-person">
+                                            <div class="student-avatar">
+                                                @(string.IsNullOrWhiteSpace(student.FullName)
+                                                    ? "S"
+                                                    : student.FullName.Substring(0, 1).ToUpper())
+                                            </div>
+
+                                            <div>
+                                                <strong>@student.FullName</strong>
+                                                <span>Student</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="age-value">
+                                            @student.Age
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="course-badge">
+                                            @student.Course
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="row-actions">
+
+                                            <a asp-action="Details"
+                                               asp-route-id="@student.Id"
+                                               class="icon-action view"
+                                               title="View Student">
+                                                <svg viewBox="0 0 24 24">
+                                                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"></path>
+                                                    <circle cx="12" cy="12" r="2.5"></circle>
+                                                </svg>
+                                            </a>
+
+                                            <a asp-action="Edit"
+                                               asp-route-id="@student.Id"
+                                               class="icon-action edit"
+                                               title="Edit Student">
+                                                <svg viewBox="0 0 24 24">
+                                                    <path d="M4 20h4L19 9l-4-4L4 16z"></path>
+                                                    <path d="m13 6 4 4"></path>
+                                                </svg>
+                                            </a>
+
+                                            <a asp-action="Delete"
+                                               asp-route-id="@student.Id"
+                                               class="icon-action delete"
+                                               title="Delete Student">
+                                                <svg viewBox="0 0 24 24">
+                                                    <path d="M4 7h16"></path>
+                                                    <path d="M10 11v6"></path>
+                                                    <path d="M14 11v6"></path>
+                                                    <path d="M6 7l1 14h10l1-14"></path>
+                                                    <path d="M9 7V4h6v3"></path>
+                                                </svg>
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <h3>No students yet</h3>
+                                        <p>Add your first student record to get started.</p>
+
+                                        <a asp-action="Create"
+                                           class="add-student-button">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 5v14"></path>
+                                                <path d="M5 12h14"></path>
+                                            </svg>
+                                            Add Student
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="students-card-footer">
+                <span id="studentCountText">
+                    Showing @students.Count of @students.Count student@(students.Count == 1 ? "" : "s")
+                </span>
+
+                <span>
+                    Student records
+                </span>
+            </div>
+
+        </section>
+
+        <div class="students-footer">
+            <span>© 2026 StudentApp</span>
+
+            <a asp-controller="Home"
+               asp-action="Privacy">
+                Privacy
+            </a>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const search = document.getElementById("tableStudentSearch");
+        const courseFilter = document.getElementById("courseFilter");
+        const rows = document.querySelectorAll(".student-row");
+        const countText = document.getElementById("studentCountText");
+
+        function filterStudents() {
+            const searchValue = (search?.value || "").toLowerCase().trim();
+            const courseValue = (courseFilter?.value || "").toLowerCase().trim();
+
+            let visibleCount = 0;
+
+            rows.forEach(function (row) {
+                const name = (row.dataset.name || "").toLowerCase();
+                const course = (row.dataset.course || "").toLowerCase();
+
+                const matchesSearch =
+                    searchValue === "" ||
+                    name.includes(searchValue) ||
+                    course.includes(searchValue);
+
+                const matchesCourse =
+                    courseValue === "" ||
+                    course === courseValue;
+
+                if (matchesSearch && matchesCourse) {
+                    row.style.display = "";
+                    visibleCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            if (countText) {
+                countText.textContent =
+                    `Showing ${visibleCount} of ${rows.length} student${rows.length === 1 ? "" : "s"}`;
+            }
+        }
+
+        search?.addEventListener("input", filterStudents);
+        courseFilter?.addEventListener("change", filterStudents);
+    });
+</script>
+}
