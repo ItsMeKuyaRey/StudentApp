@@ -6,9 +6,49 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+{
+    var connectionString =
+        builder.Configuration.GetConnectionString("DefaultConnection");
+
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException(
+            "DefaultConnection is not configured."
+        );
+    }
+
+    // Render provides PostgreSQL URLs in postgresql:// format.
+    // Convert that URL to the key/value format Npgsql expects.
+    if (connectionString.StartsWith("postgresql://") ||
+        connectionString.StartsWith("postgres://"))
+    {
+        var uri = new Uri(connectionString);
+
+        var userInfo = uri.UserInfo.Split(':', 2);
+
+        if (userInfo.Length != 2)
+        {
+            throw new InvalidOperationException(
+                "Invalid PostgreSQL connection URL."
+            );
+        }
+
+        var host = uri.Host;
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        var database = uri.AbsolutePath.TrimStart('/');
+        var username = Uri.UnescapeDataString(userInfo[0]);
+        var password = Uri.UnescapeDataString(userInfo[1]);
+
+        connectionString =
+            $"Host={host};" +
+            $"Port={port};" +
+            $"Database={database};" +
+            $"Username={username};" +
+            $"Password={password};";
+    }
+
+    options.UseNpgsql(connectionString);
+});
 
 var app = builder.Build();
 
