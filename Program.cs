@@ -17,7 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         );
     }
 
-    // Render may provide the PostgreSQL connection as:
+    // Render PostgreSQL URL:
     // postgresql://username:password@host:port/database
     if (connectionString.StartsWith("postgresql://") ||
         connectionString.StartsWith("postgres://"))
