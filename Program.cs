@@ -1,6 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using StudentApp.Data;
 
+// Render: use polling instead of inotify/file-system watchers.
+Environment.SetEnvironmentVariable(
+    "DOTNET_USE_POLLING_FILE_WATCHER",
+    "true"
+);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
